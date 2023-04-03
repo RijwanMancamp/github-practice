@@ -1,1 +1,31 @@
+name: Super-Linter Workflow
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  super-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          git clone https://github.com/github/super-linter.git
+          cd super-linter
+          ./install.sh
+
+      - name: Run Super-Linter
+        run: |
+          cd $GITHUB_WORKSPACE
+          docker run --rm \
+            -e RUN_LOCAL=true \
+            -e VALIDATE_ALL_CODEBASE=true \
+            -e DEFAULT_BRANCH=main \
+            -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+            -v $PWD:/tmp/lint \
+            github/super-linter:latest
 
